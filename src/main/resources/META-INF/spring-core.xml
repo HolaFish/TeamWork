@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+	http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+	http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+		<!-- 加载数据文件 -->
+		<bean class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
+			<property name="locations">
+				<list>
+					<value>classpath:/hibernate.properties</value> 
+					
+				</list>
+			</property>
+			<property name="ignoreUnresolvablePlaceholders" value="true" /> 
+		</bean>
+		<context:component-scan base-package="com.heisenberg">
+			<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+			<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+		</context:component-scan>
+		<!-- 配置数据源 -->
+		<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+			<property name="user" value="${user}"/>
+			<property name="password" value="${password}"/>
+			<property name="driverClass" value="${driverClass}"/>
+			<property name="jdbcUrl" value="${url}"/>
+		</bean>
+     <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate" abstract="false"  
+        lazy-init="false" autowire="default" >  
+        <property name="dataSource">  
+            <ref bean="dataSource" />  
+        </property>  
+    </bean>  
+	</beans>

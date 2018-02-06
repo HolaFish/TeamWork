@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+	http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+	http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd">
+	<!-- 加载数据文件 -->
+	<bean class="org.springframework.beans.factory.config.PreferencesPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:/system.properties</value>
+				<value>classpath:/messages.properties</value>
+			</list>
+		</property>
+
+	</bean>
+	
+    <!-- 启动扫描注解 -->
+	<context:component-scan base-package="com.heisenberg"/>
+	<!-- 启动AspectJ自动代理 -->
+    <aop:aspectj-autoproxy proxy-target-class="true"/>
+	<mvc:annotation-driven>
+		<mvc:message-converters register-defaults="true">
+			<!-- 将StringHttpMessageConverter的默认编码设为UTF-8 -->
+			<bean class="org.springframework.http.converter.StringHttpMessageConverter">  
+			    <property name="supportedMediaTypes" value = "application/json;charset=UTF-8" />  
+			</bean> 
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+
+	<mvc:default-servlet-handler />
+	<!-- 视图解析器 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/views/" />
+		<property name="suffix" value=".jsp" />
+		<property name="order" value="1" />
+	</bean>
+	
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">  
+         <!-- 请求编码格式 -->  
+         <property name="defaultEncoding" value="utf-8"></property>  
+         <!-- 上传文件大小(单位:字节) -->  
+         <property name="maxUploadSize" value="50000000"></property>  
+         <!-- 缓冲区大小(单位:KB) -->  
+         <property name="maxInMemorySize" value="1024"></property>  
+    </bean>
+    
+    <mvc:interceptors>    
+	    <mvc:interceptor>    
+	        <!-- 匹配的是url路径， 如果不配置或/**,将拦截所有的Controller -->  
+	        <mvc:mapping path="/add*" />  
+	        <mvc:mapping path="/modify*" />
+	        <mvc:mapping path="/delete*" />
+	        <mvc:mapping path="/agree*" />
+	        <mvc:mapping path="/disagree*" />
+	        <bean class="com.heisenberg.common.Interceptor.AuthorityInterceptor"></bean>    
+	    </mvc:interceptor>  
+    <!-- 当设置多个拦截器时，先按顺序调用preHandle方法，然后逆序调用每个拦截器的postHandle和afterCompletion方法 -->  
+	</mvc:interceptors>  
+</beans>
